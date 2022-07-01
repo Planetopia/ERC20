@@ -5,13 +5,13 @@ pragma solidity ^0.8.0;
 import "@openzeppelin/contracts/token/ERC20/ERC20.sol";
 import "./Lock.sol";
 
-//0x1A5e224EB8dB4473748DD61818AbaB6365AE9Ed5
-// add 7 signers, 5 of 7 signed to change a signer, 4 of 7 signed to transfer
 contract MonieToken is ERC20 {
     Lock public lock;
     address[] public signers;
 
-    constructor(uint256 initialSupply, address _lock) ERC20("Monie", "MNI") {
+    constructor(uint256 initialSupply, address _lock)
+        ERC20("$INFIBLUE WORLD", "$MONIE")
+    {
         lock = Lock(_lock);
         _mint(msg.sender, initialSupply);
     }

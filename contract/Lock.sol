@@ -15,7 +15,7 @@ contract Lock {
     address public owner;
     address public locker;
     //this declares a state variable that
-    //stores a User type
+    //stores a User type (Beneficiary)
     mapping(address => Beneficiary) public beneficiaries;
     // release start time
     uint256 public release_date;
@@ -39,19 +39,24 @@ contract Lock {
             msg.sender == locker,
             "You don't have access to this function."
         );
-        require(beneficiaries[_user].total_locked == 0);
-        beneficiaries[_user].total_locked = _amount;
-        beneficiaries[_user].current_locked = _amount;
-        beneficiaries[_user].month = _month;
-        beneficiaries[_user].released = 0;
-        beneficiaries[_user].claimed_month = 0;
+        require(block.timestamp < release_date);
+        if (beneficiaries[_user].month == 0) {
+            beneficiaries[_user].total_locked = _amount;
+            beneficiaries[_user].current_locked = _amount;
+            beneficiaries[_user].month = _month;
+            beneficiaries[_user].released = 0;
+            beneficiaries[_user].claimed_month = 0;
+        } else {
+            require(_month == beneficiaries[_user].month);
+            beneficiaries[_user].total_locked += _amount;
+            beneficiaries[_user].current_locked += _amount;
+        }
     }
 
     function release() external {
         address _beneficiary = msg.sender;
         require(beneficiaries[_beneficiary].current_locked > 0);
         Beneficiary storage beneficiary = beneficiaries[_beneficiary];
-        // release time should be later than 2022-05-01
         uint256 today = block.timestamp;
         require(today > release_date);
         uint256 total_locked = beneficiary.total_locked;
@@ -73,6 +78,5 @@ contract Lock {
         returns (Beneficiary memory)
     {
         return beneficiaries[_sender];
-
     }
 }
